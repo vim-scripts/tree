@@ -1,0 +1,6 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=1139
+
+tree is an abstract framework for tree views. I've written a FileTree plugin based on it, which behaves like  Patrick Schiel's opsplore script. It takes callback functions to comunicate with the model  upon which it works. I plan to write JExplorer based on it.
+See tree.txt for more detales.
+
+
