@@ -1,13 +1,13 @@
 " tree - an abstruct treeview 
 "
 " Author:  Wind 
-" Date:  2004-11-21  
+" Date:  2004-11-24  
 " Email:  wind-xp@tut.by 
-" Version:  0.9 
+" Version:  1.0 
 "
 
 
-"   buffer variables
+" buffer variables
 " b:Tree_InitOptionsFunction () :void -  a function for option initialization
 " b:Tree_ColorFunction () :void -  a function for highlighting deinition
 " b:Tree_InitMappingsFunction () :void -  a function for initializing mappings
@@ -15,20 +15,38 @@
 " b:Tree_IsLeafFunction (path):boolean true if it has no subnodes false otherwise
 " b:Tree_GetSubNodesFunction (path):string[] - returns list of strings separated with "\n"
 " b:Tree_OnLeafClick (path):void - do somthing on the click on a leaf 
+" b:Tree_OnPathChange (path):void - do somthing when path is changed 
 
+
+" global variables
+
+let Tree_VERSION='1.0'
+let Tree_VerticalSplit=1
+let Tree_HorizontalSplit=0
+let Tree_Right=1
+let Tree_Left=0
+let Tree_Top=0
+let Tree_Below=1
 
 " global functions
-
-function! Tree_NewTreeWindow (initialPath, orientation,width,minWidth,initOptionsFunctnion) "{{{1
+function! Tree_NewTreeWindow (initialPath, orientation,side,minWidth,minHeigh,initOptionsFunctnion) "{{{1
 	" setup options
 	" create new window
-	let splitcmd='new'
 	if a:orientation "{{{2
-		let splitcmd='vnew'
+		let splitcmd=a:minWidth.'vnew'
+	else
+		let splitcmd=a:minHeigh.'new'
 	end "}}}2
-	let splitcmd=a:width.splitcmd
+	" save splitright state
+	let SPR=&splitright
+	let SPB=&splitbelow
+	let &splitright=a:side
+	let &splitbelow=a:side
 	exe splitcmd
 	exe "setlocal wiw=".a:minWidth
+	exe "setlocal wh=".a:minHeigh
+	let &splitright=SPR
+	let &splitbelow=SPB
 	setlocal nowrap
 	" in the new buffer
 	let b:Tree_InitOptionsFunction=a:initOptionsFunctnion
@@ -38,6 +56,10 @@ endfunction "}}}1
 
 function! Tree_RebuildTree () "{{{1
 	call <SID>BuildTree (getline (1))
+endfunction "}}}1
+
+function! Tree_SetPath (path) "{{{1
+	call <SID>BuildTree (a:path)
 endfunction "}}}1
 
 function! Tree_GetPathUnderCursor () "{{{1
@@ -69,6 +91,7 @@ function! s:Init() "{{{1
 	let b:Tree_IsLeafFunction="DummyFunction"
 	let b:Tree_GetSubNodesFunction="DummyFunction"
 	let b:Tree_OnLeafClick="DummyFunction"
+	let b:Tree_OnPathChange="DummyFunction"
 	call <SID>InitOptions ()
 	call <SID>InitColors ()
 	call <SID>InitMappings ()
@@ -105,6 +128,7 @@ function! s:BuildTree (initialPath) "{{{1
 	call <SID>TreeExpand (-1,1,path)
 	" move to first entry
 	norm ggj1|g^
+	execut 'call '.b:Tree_OnPathChange."('".path."')"
 endfunction "}}}1
 
 function! s:TreeExpand (xpos,ypos,path) "{{{1
@@ -184,9 +208,9 @@ function! s:IsTreeNode (xpos,ypos) "{{{1
 		" is it a directory or file starting with +/- ?
 		"let path=s:GetPathName (a:xpos,a:ypos)
 		"if s:IsLeaf (path)
-			"return 0
+		"	return 0
 		"else
-			return 1
+		return 1
 		"end
 	else
 		return 0
@@ -221,7 +245,8 @@ function! s:GetPathName (xpos,ypos) "{{{1
 	endwhile  "}}}2
 	" finally add base path
 	" not needed, if in root
-	if getline (1)!=b:Tree_pathSeparator "{{{2
+	"if getline (1)!=b:Tree_pathSeparator "{{{2
+	if a:ypos>1 "{{{2
 		let path=getline (1).path
 	end "}}}2
 	return path
@@ -374,4 +399,4 @@ endfunction "}}}1
 function! s:OnLeafClick (path) "{{{1
 	execute "call ".b:Tree_OnLeafClick."('".a:path."')"
 endfunction "}}}1
-
+" vim:fdm=marker:

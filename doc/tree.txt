@@ -9,6 +9,7 @@
 2. Functions		   |tree_functions|
 3. Variables		   |tree_Variables|
 4. Navigating		   |tree_Navigating|
+5. Constants		   |tree_Constants|
 
 
    The tree.vim script is intended to be a base for various tree views ( for 
@@ -79,11 +80,12 @@ Pressing Return on a leaf calles function |Tree_OnLeafClick|.
 
 ==============================================================================
 *Tree_NewTreeWindow*
-Tree_NewTreeWindow (initialPath, orientation,width,minWidth,initOptionsFunctnion)
+Tree_NewTreeWindow (initialPath, orientation,side,minWidth,minHeigh,initOptionsFunctnion)
    initialPath		- path with wich tree view will start.
    orientation		- ether vertical (1) or horizontal (0) 
-   width		- start width of the window
+   side			- a side where to show it right/bottom(1) left/top(0)
    minWidth		- minimal width of the window
+   minHeigh		- minimal Heigh of the window
    initOptionsFunctnion	- a name of the function that will be called to
    initialize new tree. see |b:Tree_InitOptionsFunction|.
 ==============================================================================
@@ -148,6 +150,14 @@ b:Tree_OnLeafClick
    function name(path)
    will be called when user clicked on the leaf entry of the tree to do some
    leaf specific functions.
+==============================================================================
+*tree_Constants*
+Tree_VerticalSplit=1 - for vertical splitj
+Tree_HorizontalSplit=0 - for horizontal split
+Tree_Right=1   - for Right side window
+Tree_Left=0    - for Left side window
+Tree_Top=0     - for Top side window
+Tree_Below=1   - for bottom side window
 ==============================================================================
 
    vim:tw=78:ts=8:ft=help:norl:
